@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GDP RAG Playground (1960–2020)</title>
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- libs -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"
+    ></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lunr/lunr.min.js"></script>
+
+    <!-- our code -->
+    <script defer src="utils.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <h1>GDP RAG Playground</h1>
+        <p>
+          World Bank/OECD GDP (current US$), 1960–2020. Search by country, year,
+          or ask “highest GDP 2019”, “gdp of Japan in 2005”, “top 5 2020”.
+        </p>
+      </header>
+
+      <section class="controls">
+        <input
+          id="q"
+          type="search"
+          placeholder="e.g., highest gdp 2019 • gdp of Pakistan 2020 • top 10 2010"
+        />
+        <select id="mode">
+          <option value="keyword">Keyword (BM25-like)</option>
+          <option value="semantic">Semantic (embeddings)</option>
+          <option value="rrf">RRF (Keyword ⊕ Semantic)</option>
+        </select>
+        <label
+          >Top K <input id="k" type="number" min="1" max="50" value="5"
+        /></label>
+        <button id="go">Get Responses</button>
+      </section>
+
+      <section class="status">
+        <span id="rows">Rows: 0</span>
+        <span id="years">Years: —</span>
+        <span id="emb">Embeddings: not loaded</span>
+      </section>
+
+      <section class="grid">
+        <div class="panel">
+          <h2>RAG Answer (computed)</h2>
+          <pre id="answer" class="pre"></pre>
+        </div>
+
+        <div class="panel">
+          <h2>Keyword Retrieval</h2>
+          <pre id="kw" class="pre"></pre>
+        </div>
+
+        <div class="panel">
+          <h2>Semantic Retrieval</h2>
+          <pre id="sem" class="pre"></pre>
+        </div>
+
+        <div class="panel">
+          <h2>Reciprocal Rank Fusion</h2>
+          <pre id="rrf" class="pre"></pre>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>RAG Context Block</h2>
+        <p>
+          Copied format includes the exact tokens <code>title</code>,
+          <code>description</code>, <code>published</code>, and
+          <code>url</code>.
+        </p>
+        <textarea
+          id="context"
+          class="context"
+          spellcheck="false"
+          readonly
+        ></textarea>
+      </section>
+
+      <details class="panel">
+        <summary>About the data</summary>
+        <p>
+          GDP at purchaser's prices is the sum of gross value added by all
+          resident producers plus product taxes and minus subsidies not included
+          in the value of the products (current US dollars). Source: World Bank
+          national accounts data; OECD National Accounts data files. Annual,
+          1960–2020.
+        </p>
+      </details>
+    </main>
+  </body>
+</html>
