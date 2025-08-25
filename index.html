@@ -51,25 +51,41 @@
       </section>
 
       <section class="grid">
-        <div class="panel">
+        <div id="panel-answer" class="panel">
           <h2>RAG Answer (computed)</h2>
           <pre id="answer" class="pre"></pre>
         </div>
 
-        <div class="panel">
+        <div id="panel-keyword" class="panel">
           <h2>Keyword Retrieval</h2>
           <pre id="kw" class="pre"></pre>
         </div>
 
-        <div class="panel">
+        <div id="panel-semantic" class="panel">
           <h2>Semantic Retrieval</h2>
           <pre id="sem" class="pre"></pre>
         </div>
 
-        <div class="panel">
+        <div id="panel-rrf" class="panel">
           <h2>Reciprocal Rank Fusion</h2>
           <pre id="rrf" class="pre"></pre>
         </div>
+      </section>
+
+      <section class="panel">
+        <h2>RAG Context Block</h2>
+        <p>
+          Using: <strong id="context-source">—</strong> &nbsp;•&nbsp; Copied
+          format includes the exact tokens <code>title</code>,
+          <code>description</code>, <code>published</code>, and
+          <code>url</code>.
+        </p>
+        <textarea
+          id="context"
+          class="context"
+          spellcheck="false"
+          readonly
+        ></textarea>
       </section>
 
       <section class="panel">

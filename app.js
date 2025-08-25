@@ -11,14 +11,10 @@ let EMBEDDINGS = null // [[...] ...]  (optional) per ROWS index
 document.addEventListener('DOMContentLoaded', boot)
 
 async function boot() {
-  // load CSV
   await loadCSV()
-  // load embeddings (optional)
   await loadEmbeddings()
-  // build keyword index
   buildLunrIndex()
 
-  // status
   document.getElementById('rows').textContent = `Rows: ${ROWS.length}`
   document.getElementById('years').textContent = `Years: ${YEARS[0]}–${
     YEARS[YEARS.length - 1]
@@ -27,11 +23,17 @@ async function boot() {
     EMBEDDINGS ? 'loaded' : 'not loaded'
   }`
 
-  // wire UI
   document.getElementById('go').addEventListener('click', runAll)
   document.getElementById('q').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') runAll()
   })
+
+  // NEW: live update on mode/topK change
+  document.getElementById('mode').addEventListener('change', runAll)
+  document.getElementById('k').addEventListener('change', runAll)
+
+  // Optional: run once on load so the page isn’t empty
+  runAll()
 }
 
 // ------------ load & prep CSV ------------
@@ -256,10 +258,10 @@ function runAll() {
   )
   const mode = document.getElementById('mode').value
 
-  // ANSWER (computed)
+  // Answer
   document.getElementById('answer').textContent = computeAnswer(q)
 
-  // RETRIEVALS
+  // Retrievals
   const kwIdx = keywordSearch(q, k)
   const semIdx = semanticSearch(q, k)
   const rrfIdx = rrfFuse(q, k)
@@ -270,10 +272,13 @@ function runAll() {
     : 'Semantic disabled (no embeddings.json)'
   document.getElementById('rrf').textContent = prettyList(rrfIdx)
 
-  // CONTEXT
+  // Context from selected mode
   const which =
     mode === 'keyword' ? kwIdx : mode === 'semantic' ? semIdx : rrfIdx
   document.getElementById('context').value = buildContext(which)
+
+  // NEW: highlight active panel + label
+  highlightMode(mode)
 }
 
 function prettyList(ids) {
@@ -284,4 +289,24 @@ function prettyList(ids) {
     }: ${formatUSD(r.latestGDP)}`
   })
   return lines.join('\n')
+}
+function highlightMode(mode) {
+  const map = {
+    keyword: document.getElementById('panel-keyword'),
+    semantic: document.getElementById('panel-semantic'),
+    rrf: document.getElementById('panel-rrf'),
+  }
+  // clear
+  Object.values(map).forEach((el) => el.classList.remove('active'))
+  // set
+  ;(map[mode] || null)?.classList.add('active')
+
+  // label for context source
+  const label =
+    mode === 'keyword'
+      ? 'Keyword (BM25-like)'
+      : mode === 'semantic'
+      ? 'Semantic (embeddings)'
+      : 'RRF (Keyword ⊕ Semantic)'
+  document.getElementById('context-source').textContent = label
 }
